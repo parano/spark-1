@@ -198,7 +198,7 @@ trait HasThresholds extends Params {
    * Param for Thresholds in multi-class classification to adjust the probability of predicting each class. Array must have length equal to the number of classes, with values &gt; 0 excepting that at most one value may be 0. The class with largest value p/t is predicted, where p is the original probability of that class and t is the class's threshold.
    * @group param
    */
-  final val thresholds: DoubleArrayParam = new DoubleArrayParam(this, "thresholds", "Thresholds in multi-class classification to adjust the probability of predicting each class. Array must have length equal to the number of classes, with values > 0 excepting that at most one value may be 0. The class with largest value p/t is predicted, where p is the original probability of that class and t is the class's threshold", (t: Array[Double]) => t.forall(_ >= 0) && t.count(_ == 0) <= 1)
+  val thresholds: DoubleArrayParam = new DoubleArrayParam(this, "thresholds", "Thresholds in multi-class classification to adjust the probability of predicting each class. Array must have length equal to the number of classes, with values > 0 excepting that at most one value may be 0. The class with largest value p/t is predicted, where p is the original probability of that class and t is the class's threshold", (t: Array[Double]) => t.forall(_ >= 0) && t.count(_ == 0) <= 1)
 
   /** @group getParam */
   def getThresholds: Array[Double] = $(thresholds)
@@ -275,6 +275,25 @@ trait HasOutputCols extends Params {
 }
 
 /**
+ * Trait for shared param numFeatures (default: 262144). This trait may be changed or
+ * removed between minor versions.
+ */
+@DeveloperApi
+trait HasNumFeatures extends Params {
+
+  /**
+   * Param for Number of features. Should be greater than 0.
+   * @group param
+   */
+  final val numFeatures: IntParam = new IntParam(this, "numFeatures", "Number of features. Should be greater than 0", ParamValidators.gt(0))
+
+  setDefault(numFeatures, 262144)
+
+  /** @group getParam */
+  final def getNumFeatures: Int = $(numFeatures)
+}
+
+/**
  * Trait for shared param checkpointInterval. This trait may be changed or
  * removed between minor versions.
  */
@@ -282,10 +301,10 @@ trait HasOutputCols extends Params {
 trait HasCheckpointInterval extends Params {
 
   /**
-   * Param for set checkpoint interval (&gt;= 1) or disable checkpoint (-1). E.g. 10 means that the cache will get checkpointed every 10 iterations.
+   * Param for set checkpoint interval (&gt;= 1) or disable checkpoint (-1). E.g. 10 means that the cache will get checkpointed every 10 iterations. Note: this setting will be ignored if the checkpoint directory is not set in the SparkContext.
    * @group param
    */
-  final val checkpointInterval: IntParam = new IntParam(this, "checkpointInterval", "set checkpoint interval (>= 1) or disable checkpoint (-1). E.g. 10 means that the cache will get checkpointed every 10 iterations", (interval: Int) => interval == -1 || interval >= 1)
+  final val checkpointInterval: IntParam = new IntParam(this, "checkpointInterval", "set checkpoint interval (>= 1) or disable checkpoint (-1). E.g. 10 means that the cache will get checkpointed every 10 iterations. Note: this setting will be ignored if the checkpoint directory is not set in the SparkContext", (interval: Int) => interval == -1 || interval >= 1)
 
   /** @group getParam */
   final def getCheckpointInterval: Int = $(checkpointInterval)
@@ -400,6 +419,25 @@ trait HasTol extends Params {
 }
 
 /**
+ * Trait for shared param relativeError (default: 0.001). This trait may be changed or
+ * removed between minor versions.
+ */
+@DeveloperApi
+trait HasRelativeError extends Params {
+
+  /**
+   * Param for the relative target precision for the approximate quantile algorithm. Must be in the range [0, 1].
+   * @group expertParam
+   */
+  final val relativeError: DoubleParam = new DoubleParam(this, "relativeError", "the relative target precision for the approximate quantile algorithm. Must be in the range [0, 1]", ParamValidators.inRange(0, 1))
+
+  setDefault(relativeError, 0.001)
+
+  /** @group expertGetParam */
+  final def getRelativeError: Double = $(relativeError)
+}
+
+/**
  * Trait for shared param stepSize. This trait may be changed or
  * removed between minor versions.
  */
@@ -503,5 +541,41 @@ trait HasLoss extends Params {
 
   /** @group getParam */
   final def getLoss: String = $(loss)
+}
+
+/**
+ * Trait for shared param distanceMeasure (default: "euclidean"). This trait may be changed or
+ * removed between minor versions.
+ */
+@DeveloperApi
+trait HasDistanceMeasure extends Params {
+
+  /**
+   * Param for The distance measure. Supported options: 'euclidean' and 'cosine'.
+   * @group param
+   */
+  final val distanceMeasure: Param[String] = new Param[String](this, "distanceMeasure", "The distance measure. Supported options: 'euclidean' and 'cosine'", ParamValidators.inArray(Array("euclidean", "cosine")))
+
+  setDefault(distanceMeasure, "euclidean")
+
+  /** @group getParam */
+  final def getDistanceMeasure: String = $(distanceMeasure)
+}
+
+/**
+ * Trait for shared param validationIndicatorCol. This trait may be changed or
+ * removed between minor versions.
+ */
+@DeveloperApi
+trait HasValidationIndicatorCol extends Params {
+
+  /**
+   * Param for name of the column that indicates whether each row is for training or for validation. False indicates training; true indicates validation..
+   * @group param
+   */
+  final val validationIndicatorCol: Param[String] = new Param[String](this, "validationIndicatorCol", "name of the column that indicates whether each row is for training or for validation. False indicates training; true indicates validation.")
+
+  /** @group getParam */
+  final def getValidationIndicatorCol: String = $(validationIndicatorCol)
 }
 // scalastyle:on
